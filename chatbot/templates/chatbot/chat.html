@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat with Gemini</title>
+</head>
+<body>
+    <h1>Chat with Gemini</h1>
+
+    <!-- Logout button -->
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+
+    <h2>Your Uploaded Documents</h2>
+    <ul>
+        {% for doc in docs %}
+            <li>
+                <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name }}</a>
+                (uploaded {{ doc.uploaded_at|date:"Y-m-d H:i" }})
+            </li>
+        {% empty %}
+            <li>No documents uploaded yet.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Link to upload page -->
+    <p><a href="{% url 'upload_document' %}">Upload a new document</a></p>
+
+    <!-- Previous chat history -->
+    <div id="chatLog" style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:auto;">
+        {% for chat in history %}
+            <p><b>You:</b> {{ chat.message }}</p>
+            <p><b>Bot:</b> {{ chat.reply }}</p>
+        {% empty %}
+            <p>No previous chats.</p>
+        {% endfor %}
+    </div>
+
+    <!-- New message input -->
+    <input type="text" id="userMessage" placeholder="Type a message...">
+    <button type="button" onclick="sendMessage()">Send</button>
+
+    <script>
+        // Global thread id for keeping conversation
+        let threadId = null;
+
+        async function sendMessage() {
+            const messageInput = document.getElementById("userMessage");
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Send to Django backend
+            const response = await fetch("/chatbot_response/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: message,
+                    thread_id: threadId // send thread id if exists
+                })
+            });
+
+            const data = await response.json();
+
+            // Save threadId from backend
+            threadId = data.thread_id;
+
+            // Update chat log with new messages
+            const log = document.getElementById("chatLog");
+            data.messages.forEach(msg => {
+                const p = document.createElement("p");
+                p.innerHTML = `<b>${msg.sender}:</b> ${msg.message}`;
+                log.appendChild(p);
+            });
+
+            // Clear input
+            messageInput.value = "";
+            log.scrollTop = log.scrollHeight; // auto scroll
+        }
+    </script>
+</body>
+</html>

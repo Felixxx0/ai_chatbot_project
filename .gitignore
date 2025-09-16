@@ -1,0 +1,25 @@
+# Python bytecode
+*.pyc
+__pycache__/
+
+# Django
+db.sqlite3
+*.sqlite3
+/staticfiles/
+media/
+.DS_Store
+
+# Environment (API keys, secrets)
+.env
+venv/
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# IDE settings
+*.iml
+
+# Ignore uploaded documents
+documents/
