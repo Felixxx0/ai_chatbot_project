@@ -49,6 +49,7 @@ def upload_document(request):
     return render(request, "chatbot/upload.html", {"form": form})
 
 
+@login_required
 def chat_page(request):
     history = ChatMessage.objects.filter(
         thread__user=request.user).order_by("timestamp")
