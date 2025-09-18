@@ -24,10 +24,14 @@ else:
 
 model = genai.GenerativeModel("gemini-1.5-flash")
 
+
 class DocumentUploadForm(forms.ModelForm):
+
     class Meta:
         model = UploadedDocument
         fields = ["file"]
+
+
 # ------------------------------
 # Chat Page View
 # ------------------------------
@@ -44,10 +48,18 @@ def upload_document(request):
         form = DocumentUploadForm()
     return render(request, "chatbot/upload.html", {"form": form})
 
+
 def chat_page(request):
-    history = ChatMessage.objects.filter(thread__user=request.user).order_by("timestamp")
-    docs = UploadedDocument.objects.filter(user=request.user).order_by("-uploaded_at")
-    return render(request, "chatbot/chat.html", {"history": history, "docs": docs})
+    history = ChatMessage.objects.filter(
+        thread__user=request.user).order_by("timestamp")
+    docs = UploadedDocument.objects.filter(
+        user=request.user).order_by("-uploaded_at")
+    return render(request, "chatbot/chat.html", {
+        "history": history,
+        "docs": docs
+    })
+
+
 # ------------------------------
 # Chatbot Response API
 # ------------------------------
@@ -60,15 +72,18 @@ def chatbot_response(request):
 
         # ✅ Step 1: Select or create thread
         if thread_id:
-            thread = get_object_or_404(ChatThread, id=thread_id, user=request.user)
+            thread = get_object_or_404(ChatThread,
+                                       id=thread_id,
+                                       user=request.user)
         else:
             thread = ChatThread.objects.create(
                 user=request.user,
-                title=user_message[:30] if user_message else "New Chat"
-            )
+                title=user_message[:30] if user_message else "New Chat")
 
         # ✅ Step 2: Save user message
-        ChatMessage.objects.create(thread=thread, sender="user", message=user_message)
+        ChatMessage.objects.create(thread=thread,
+                                   sender="user",
+                                   message=user_message)
 
         # ✅ Step 3: Call Gemini API
         try:
@@ -78,21 +93,23 @@ def chatbot_response(request):
             bot_reply = f"❌ Gemini Error: {str(e)}"
 
         # ✅ Step 4: Save bot reply
-        ChatMessage.objects.create(thread=thread, sender="bot", message=bot_reply)
+        ChatMessage.objects.create(thread=thread,
+                                   sender="bot",
+                                   message=bot_reply)
 
         # ✅ Step 5: Return conversation
         return JsonResponse({
-            "thread_id": thread.id,
-            "title": thread.title,
-            "messages": [
-                {
-                    "sender": m.sender,
-                    "message": m.message,
-                    "timestamp": m.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-                }
-                for m in thread.messages.all().order_by("timestamp")
-            ]
+            "thread_id":
+            thread.id,
+            "title":
+            thread.title,
+            "messages": [{
+                "sender": m.sender,
+                "message": m.message,
+                "timestamp": m.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            } for m in thread.messages.all().order_by("timestamp")]
         })
+
 
 # ------------------------------
 # Authentication Views
@@ -103,10 +120,14 @@ def signup_view(request):
         email = request.POST['email']
         password = request.POST['password']
         if User.objects.filter(username=username).exists():
-            return render(request, 'chatbot/signup.html', {'error': 'Username already exists!'})
-        User.objects.create_user(username=username, email=email, password=password)
+            return render(request, 'chatbot/signup.html',
+                          {'error': 'Username already exists!'})
+        User.objects.create_user(username=username,
+                                 email=email,
+                                 password=password)
         return redirect('login')
     return render(request, 'chatbot/signup.html')
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -117,8 +138,10 @@ def login_view(request):
             login(request, user)
             return redirect('chat_page')
         else:
-            return render(request, 'chatbot/login.html', {'error': 'Invalid credentials!'})
+            return render(request, 'chatbot/login.html',
+                          {'error': 'Invalid credentials!'})
     return render(request, 'chatbot/login.html')
+
 
 def logout_view(request):
     logout(request)
