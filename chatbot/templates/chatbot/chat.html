@@ -30,8 +30,7 @@
     <!-- Previous chat history -->
     <div id="chatLog" style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:auto;">
         {% for chat in history %}
-            <p><b>You:</b> {{ chat.message }}</p>
-            <p><b>Bot:</b> {{ chat.reply }}</p>
+            <p><b>{{ chat.sender|capfirst }}:</b> {{ chat.message }}</p>
         {% empty %}
             <p>No previous chats.</p>
         {% endfor %}
