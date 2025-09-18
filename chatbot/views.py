@@ -8,9 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import google.generativeai as genai
-from .models import ChatThread, ChatMessage
+from .models import ChatThread, ChatMessage, UploadedDocument
 from django import forms
-from .models import UploadedDocument
 
 # ------------------------------
 # Gemini API Setup
@@ -33,7 +32,6 @@ class DocumentUploadForm(forms.ModelForm):
 # Chat Page View
 # ------------------------------
 @login_required
-
 def upload_document(request):
     if request.method == "POST":
         form = DocumentUploadForm(request.POST, request.FILES)
