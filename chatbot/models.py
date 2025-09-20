@@ -1,11 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 # ------------------------------
 # Chat Models
 # ------------------------------
 class ChatThread(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="threads")
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name="threads")
     title = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -14,8 +17,11 @@ class ChatThread(models.Model):
 
 
 class ChatMessage(models.Model):
-    thread = models.ForeignKey(ChatThread, on_delete=models.CASCADE, related_name="messages")
-    sender = models.CharField(max_length=10, choices=[("user", "User"), ("bot", "Bot")])
+    thread = models.ForeignKey(ChatThread,
+                               on_delete=models.CASCADE,
+                               related_name="messages")
+    sender = models.CharField(max_length=10,
+                              choices=[("user", "User"), ("bot", "Bot")])
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
