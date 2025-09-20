@@ -24,11 +24,15 @@ SECRET_KEY = os.getenv("SECRET_KEY",
                        "django-insecure-dev-key-only-for-development")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
 # Allow all hosts for Replit environment
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.repl.co",
+    "https://*.replit.dev",
+]
 ALLOWED_HOSTS = ['*']
 
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 # Application definition
 
 INSTALLED_APPS = [
@@ -128,7 +132,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://ai_chatbot_project.alexasavior37.repl.co",
-    "https://ai_chatbot_project.alexasavior37.replit.dev",
-]
